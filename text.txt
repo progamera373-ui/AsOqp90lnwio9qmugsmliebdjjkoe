@@ -1,0 +1,764 @@
+local player = game.Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "NexaHubKeySystem"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(0, 440, 0, 340)
+bg.Position = UDim2.new(0.5, -220, 0.4, -170)
+bg.BackgroundColor3 = Color3.fromRGB(30, 31, 34)
+bg.BackgroundTransparency = 0.15
+bg.BorderSizePixel = 0
+bg.Parent = gui
+
+local border = Instance.new("Frame")
+border.Size = UDim2.new(1, 4, 1, 4)
+border.Position = UDim2.new(0, -2, 0, -2)
+border.BackgroundColor3 = Color3.fromRGB(63, 65, 71)
+border.BackgroundTransparency = 0.5
+border.BorderSizePixel = 0
+border.ZIndex = 0
+border.Parent = bg
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 0, 30)
+title.Position = UDim2.new(0, 20, 0, 20)
+title.BackgroundTransparency = 1
+title.Text = "NEXA HUB KEYSYSTEM"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Parent = bg
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -40, 0, 20)
+subtitle.Position = UDim2.new(0, 20, 0, 55)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Ingresa tu clave de licencia para continuar"
+subtitle.TextColor3 = Color3.fromRGB(148, 155, 164)
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 14
+subtitle.Parent = bg
+
+local inputLabel = Instance.new("TextLabel")
+inputLabel.Size = UDim2.new(1, -40, 0, 16)
+inputLabel.Position = UDim2.new(0, 20, 0, 95)
+inputLabel.BackgroundTransparency = 1
+inputLabel.Text = "CLAVE DE LICENCIA"
+inputLabel.TextColor3 = Color3.fromRGB(148, 155, 164)
+inputLabel.Font = Enum.Font.GothamBold
+inputLabel.TextSize = 10
+inputLabel.Parent = bg
+
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(1, -40, 0, 40)
+textBox.Position = UDim2.new(0, 20, 0, 115)
+textBox.BackgroundColor3 = Color3.fromRGB(26, 27, 30)
+textBox.BackgroundTransparency = 0
+textBox.BorderSizePixel = 1
+textBox.BorderColor3 = Color3.fromRGB(63, 65, 71)
+textBox.Text = ""
+textBox.PlaceholderText = "Ingresa tu clave..."
+textBox.TextColor3 = Color3.fromRGB(46, 204, 113)
+textBox.PlaceholderColor3 = Color3.fromRGB(74, 77, 85)
+textBox.Font = Enum.Font.Code
+textBox.TextSize = 16
+textBox.ClearTextOnFocus = false
+textBox.Parent = bg
+
+local discordBtn = Instance.new("TextButton")
+discordBtn.Size = UDim2.new(0.5, -25, 0, 44)
+discordBtn.Position = UDim2.new(0, 20, 0, 175)
+discordBtn.BackgroundColor3 = Color3.fromRGB(43, 45, 49)
+discordBtn.BorderSizePixel = 1
+discordBtn.BorderColor3 = Color3.fromRGB(63, 65, 71)
+discordBtn.Text = "DISCORD"
+discordBtn.TextColor3 = Color3.fromRGB(219, 222, 225)
+discordBtn.Font = Enum.Font.GothamSemibold
+discordBtn.TextSize = 15
+discordBtn.Parent = bg
+
+discordBtn.MouseButton1Click:Connect(function()
+	local url = "https://discord.gg/u3BJXMVpM"
+	pcall(function()
+		if game:GetService("GuiService"):IsTenFootInterface() then
+			if setclipboard then setclipboard(url) end
+		else
+			game:GetService("GuiService"):OpenBrowserWindow(url)
+		end
+	end)
+end)
+
+local enterBtn = Instance.new("TextButton")
+enterBtn.Size = UDim2.new(0.5, -25, 0, 44)
+enterBtn.Position = UDim2.new(0.5, 5, 0, 175)
+enterBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+enterBtn.BorderSizePixel = 1
+enterBtn.BorderColor3 = Color3.fromRGB(39, 174, 96)
+enterBtn.Text = "Ingresar"
+enterBtn.TextColor3 = Color3.fromRGB(10, 10, 15)
+enterBtn.Font = Enum.Font.GothamBold
+enterBtn.TextSize = 15
+enterBtn.Parent = bg
+
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -40, 0, 20)
+status.Position = UDim2.new(0, 20, 0, 235)
+status.BackgroundTransparency = 1
+status.Text = "Esperando clave..."
+status.TextColor3 = Color3.fromRGB(148, 155, 164)
+status.Font = Enum.Font.Gotham
+status.TextSize = 13
+status.Parent = bg
+
+local VALID_KEY = "Nexxa1"
+
+local function normalizeKey(str)
+	return string.gsub(string.upper(str), "[%s%-_]", "")
+end
+
+local function setStatus(msg, color)
+	status.Text = msg
+	status.TextColor3 = color or Color3.fromRGB(148, 155, 164)
+end
+
+enterBtn.MouseButton1Click:Connect(function()
+	local input = textBox.Text
+	if input == "" then
+		setStatus("Por favor ingresa una clave", Color3.fromRGB(231, 76, 60))
+		return
+	end
+
+	if normalizeKey(input) == string.upper(VALID_KEY) then
+		setStatus("Sistema activado correctamente", Color3.fromRGB(46, 204, 113))
+		task.wait(0.5)
+		gui:Destroy()
+		showWorldSelection()
+	else
+		setStatus("incorrecta", Color3.fromRGB(231, 76, 60))
+		textBox.Text = ""
+		textBox:CaptureFocus()
+	end
+end)
+
+textBox.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		enterBtn.MouseButton1Click:Fire()
+	end
+end)
+
+function showWorldSelection()
+	local selectGui = Instance.new("ScreenGui")
+	selectGui.Name = "WorldSelection"
+	selectGui.ResetOnSpawn = false
+	selectGui.Parent = player:WaitForChild("PlayerGui")
+
+	local selectBg = Instance.new("Frame")
+	selectBg.Size = UDim2.new(0, 440, 0, 180)
+	selectBg.Position = UDim2.new(0.5, -220, 0.4, -90)
+	selectBg.BackgroundColor3 = Color3.fromRGB(30, 31, 34)
+	selectBg.BackgroundTransparency = 0.15
+	selectBg.BorderSizePixel = 0
+	selectBg.Parent = selectGui
+
+	local selectBorder = Instance.new("Frame")
+	selectBorder.Size = UDim2.new(1, 4, 1, 4)
+	selectBorder.Position = UDim2.new(0, -2, 0, -2)
+	selectBorder.BackgroundColor3 = Color3.fromRGB(63, 65, 71)
+	selectBorder.BackgroundTransparency = 0.5
+	selectBorder.BorderSizePixel = 0
+	selectBorder.ZIndex = 0
+	selectBorder.Parent = selectBg
+
+	local selectTitle = Instance.new("TextLabel")
+	selectTitle.Size = UDim2.new(1, -40, 0, 30)
+	selectTitle.Position = UDim2.new(0, 20, 0, 20)
+	selectTitle.BackgroundTransparency = 1
+	selectTitle.Text = "SELECCIONA UN MUNDO"
+	selectTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	selectTitle.Font = Enum.Font.GothamBold
+	selectTitle.TextSize = 20
+	selectTitle.Parent = selectBg
+
+	local function createWorldButton(text, xPos, callback)
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(0.3, -10, 0, 50)
+		btn.Position = UDim2.new(xPos, 5, 0, 80)
+		btn.BackgroundColor3 = Color3.fromRGB(0, 160, 0)
+		btn.BorderSizePixel = 1
+		btn.BorderColor3 = Color3.fromRGB(46, 204, 113)
+		btn.Text = text
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 20
+		btn.Parent = selectBg
+		btn.MouseButton1Click:Connect(callback)
+		return btn
+	end
+
+	createWorldButton("MUNDO 1", 0.033, function()
+		selectGui:Destroy()
+		loadWorld1()
+	end)
+
+	createWorldButton("MUNDO 2", 0.366, function()
+		selectGui:Destroy()
+		loadWorld2()
+	end)
+
+	createWorldButton("MUNDO 3", 0.7, function()
+		selectGui:Destroy()
+		loadWorld3()
+	end)
+end
+
+function loadWorld1()
+	local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Nexa-Library-main-library-ui/refs/heads/main/NexaHub%20main%20.lua", true))()
+	local mainWindow = library:AddWindow("                 NEXA HUB | WORLD 1    " .. player.DisplayName, {
+		title_bar = {
+			Color3.fromRGB(0, 100, 0),
+			Color3.fromRGB(0, 160, 0),
+			Color3.fromRGB(46, 204, 113)
+		},
+		title_bar_transparency = 0.2,
+		background = {
+			Color3.fromRGB(0, 30, 0),
+			Color3.fromRGB(0, 60, 0),
+			Color3.fromRGB(0, 90, 0)
+		},
+		background_transparency = 0.1,
+		main_color = Color3.fromRGB(46, 204, 113),
+		min_size = Vector2.new(650, 650),
+		can_resize = true,
+	})
+
+	local separator = string.rep("═", 38)
+	local allLabels = {}
+
+	local function addRainbowLabel(tab, text, textSize)
+		local lbl = tab:AddLabel(text)
+		if textSize then lbl.TextSize = textSize end
+		table.insert(allLabels, lbl)
+		return lbl
+	end
+
+	local infoTab = mainWindow:AddTab("InfoTab")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "WELCOME TO NEXA HUB  FREMIUN", 28)
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "Made by: ALAN||")
+	addRainbowLabel(infoTab, "Version: v1.")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "My Friends:")
+	addRainbowLabel(infoTab, "PANA TQ")
+	addRainbowLabel(infoTab, "CRIWS")
+
+	task.spawn(function()
+		while true do
+			local hue = tick() * 0.2 % 1
+			local color = Color3.fromHSV(hue, 0.9, 1)
+			for _, lbl in ipairs(allLabels) do
+				pcall(function() lbl.TextColor3 = color end)
+			end
+			task.wait(0.02)
+		end
+	end)
+
+	local MainTab = mainWindow:AddTab("Main")
+
+	local pathsW1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Local-parths-v2/refs/heads/main/LocalPlayer.lua"))()
+	local selectedPathW1 = nil
+	local autoWalkEnabledW1 = false
+	local walkSpeedW1 = 100
+	local currentTweenW1 = nil
+
+	local EXACT_NAMES_TO_DESTROY_W1 = {
+		"CorridorTrap","CorridorTrap2","LavaTower","NPC_Zone10","NPC_Zone12","NPC & Piege","NPC15"
+	}
+
+	local function isExactNameTargetedW1(name)
+		for _, target in ipairs(EXACT_NAMES_TO_DESTROY_W1) do
+			if name == target then return true end
+		end
+		return false
+	end
+
+	local destroyedSetW1 = setmetatable({}, {__mode = "k"})
+
+	local function safeDestroyW1(instance)
+		if destroyedSetW1[instance] then return end
+		destroyedSetW1[instance] = true
+		pcall(function() instance:Destroy() end)
+	end
+
+	local function removeObstaclesW1()
+		local removedCount = 0
+		for _, descendant in ipairs(Workspace:GetDescendants()) do
+			if descendant.Parent and isExactNameTargetedW1(descendant.Name) then
+				safeDestroyW1(descendant)
+				removedCount = removedCount + 1
+			end
+		end
+		print("[NexaHub] REMOVE OBSTACLES W1: " .. removedCount .. " removed.")
+	end
+
+	local pathDropdownW1 = MainTab:AddDropdown("Select Distance", function(value)
+		selectedPathW1 = pathsW1[value]
+	end)
+	pathDropdownW1:Add("10k")
+	pathDropdownW1:Add("25k")
+	pathDropdownW1:Add("50k")
+	pathDropdownW1:Add("150k")
+
+	local speedDropdownW1 = MainTab:AddDropdown("Walk Speed", function(value)
+		walkSpeedW1 = tonumber(value)
+	end)
+	speedDropdownW1:Add("50")
+	speedDropdownW1:Add("100")
+	speedDropdownW1:Add("150")
+	speedDropdownW1:Add("200")
+	speedDropdownW1:Add("300")
+
+    -- SWITCH AUTO WIM RECUPERADO
+	MainTab:AddSwitch("Auto Wim", function(enabled)
+		autoWalkEnabledW1 = enabled
+		if enabled then
+			removeObstaclesW1()
+		else
+			if currentTweenW1 then currentTweenW1:Cancel(); currentTweenW1 = nil end
+		end
+	end)
+
+	MainTab:AddButton("REMOVE OBSTACLES", function() removeObstaclesW1() end)
+
+	task.spawn(function()
+		while task.wait() do
+			if autoWalkEnabledW1 and selectedPathW1 and #selectedPathW1 > 0 then
+				local char = player.Character
+				if not char or not char:FindFirstChild("HumanoidRootPart") then task.wait(1); continue end
+				local hrp = char.HumanoidRootPart
+				for _, p in ipairs(char:GetDescendants()) do
+					if p:IsA("BasePart") and p.CanCollide then p.CanCollide = false end
+				end
+				for i = 1, #selectedPathW1 do
+					if not autoWalkEnabledW1 then break end
+					local pos = selectedPathW1[i]
+					while autoWalkEnabledW1 and (hrp.Position - pos).Magnitude > 2 do
+						hrp.Velocity = Vector3.zero
+						hrp.RotVelocity = Vector3.zero
+						local dist = (hrp.Position - pos).Magnitude
+						local t = TweenInfo.new(dist / walkSpeedW1, Enum.EasingStyle.Linear)
+						currentTweenW1 = game:GetService("TweenService"):Create(hrp, t, {CFrame = CFrame.new(pos)})
+						currentTweenW1:Play()
+						currentTweenW1.Completed:Wait()
+						currentTweenW1 = nil
+						task.wait()
+					end
+				end
+				if autoWalkEnabledW1 and char:FindFirstChild("Humanoid") then
+					char.Humanoid.Jump = true
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.One, false, game) end)
+					task.wait(1)
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.One, false, game) end)
+				end
+			end
+		end
+	end)
+
+	local SettingsTab = mainWindow:AddTab("Settings")
+	local antiPauseEnabled = false
+	SettingsTab:AddSwitch("Anti Gameplay Paused", function(enabled)
+		antiPauseEnabled = enabled
+		if enabled then
+			task.spawn(function()
+				while antiPauseEnabled do
+					pcall(function() player.GameplayPaused = false end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+end
+
+function loadWorld2()
+	local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Nexa-Library-main-library-ui/refs/heads/main/NexaHub%20main%20.lua", true))()
+	local mainWindow = library:AddWindow("                 NEXA HUB | WORLD 2    " .. player.DisplayName, {
+		title_bar = {
+			Color3.fromRGB(0, 100, 0),
+			Color3.fromRGB(0, 160, 0),
+			Color3.fromRGB(46, 204, 113)
+		},
+		title_bar_transparency = 0.2,
+		background = {
+			Color3.fromRGB(0, 30, 0),
+			Color3.fromRGB(0, 60, 0),
+			Color3.fromRGB(0, 90, 0)
+		},
+		background_transparency = 0.1,
+		main_color = Color3.fromRGB(46, 204, 113),
+		min_size = Vector2.new(650, 650),
+		can_resize = true,
+	})
+
+	local separator = string.rep("═", 38)
+	local allLabels = {}
+
+	local function addRainbowLabel(tab, text, textSize)
+		local lbl = tab:AddLabel(text)
+		if textSize then lbl.TextSize = textSize end
+		table.insert(allLabels, lbl)
+		return lbl
+	end
+
+	local infoTab = mainWindow:AddTab("InfoTab")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "WELCOME TO NEXA HUB  FREMIUN", 28)
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "Made by: ALAN||")
+	addRainbowLabel(infoTab, "Version: v1.")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "My Friends:")
+	addRainbowLabel(infoTab, "PANA TQ")
+	addRainbowLabel(infoTab, "CRIWS")
+
+	task.spawn(function()
+		while true do
+			local hue = tick() * 0.2 % 1
+			local color = Color3.fromHSV(hue, 0.9, 1)
+			for _, lbl in ipairs(allLabels) do
+				pcall(function() lbl.TextColor3 = color end)
+			end
+			task.wait(0.02)
+		end
+	end)
+
+	local MainTab = mainWindow:AddTab("Main")
+
+	local pathsW2 = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Local-parths/refs/heads/main/Local.luau.cordenadas.lua"))()
+	local selectedPathW2 = nil
+	local autoWalkEnabledW2 = false
+	local walkSpeedW2 = 100
+	local currentTweenW2 = nil
+
+	local EXACT_NAMES_TO_DESTROY_W2 = {
+		"MovingWall1","MovingWall2","MovingWall3","MovingWall4","MovingWall5",
+		"MovingWall6","MovingWall7","MovingWall8","MovingWall9","MovingWalls",
+		"LavaPart","NPC5_AttackZone","NPC9_AttackZone","Piques","piques",
+		"Movement","Tsunami","TsunamiEnd","TsunamiSpawn","TriggerPart",
+		"Twomp","Twomps","Ventilateurs","FanEffects",
+	}
+
+	local PROTECTED_NAMES_W2 = {["Bridge1"] = true}
+
+	local function isExactNameTargetedW2(name)
+		if PROTECTED_NAMES_W2[name] then return false end
+		for _, target in ipairs(EXACT_NAMES_TO_DESTROY_W2) do
+			if name == target then return true end
+		end
+		return false
+	end
+
+	local destroyedSetW2 = setmetatable({}, {__mode = "k"})
+
+	local function safeDestroyW2(instance)
+		if destroyedSetW2[instance] then return end
+		destroyedSetW2[instance] = true
+		pcall(function() instance:Destroy() end)
+	end
+
+	local function removeObstaclesW2()
+		local removedCount = 0
+		for _, descendant in ipairs(Workspace:GetDescendants()) do
+			if descendant.Parent and isExactNameTargetedW2(descendant.Name) then
+				safeDestroyW2(descendant)
+				removedCount = removedCount + 1
+			end
+		end
+		print("[NexaHub] REMOVE OBSTACLES W2: " .. removedCount .. " removed.")
+	end
+
+	local pathDropdownW2 = MainTab:AddDropdown("Select Distance", function(value)
+		selectedPathW2 = pathsW2[value]
+	end)
+	pathDropdownW2:Add("250k")
+	pathDropdownW2:Add("400k")
+	pathDropdownW2:Add("600k")
+	pathDropdownW2:Add("1m")
+	pathDropdownW2:Add("1.5m")
+	pathDropdownW2:Add("2m")
+	pathDropdownW2:Add("4m")
+	pathDropdownW2:Add("6m")
+	pathDropdownW2:Add("10m")
+	pathDropdownW2:Add("15m")
+	pathDropdownW2:Add("25m")
+	pathDropdownW2:Add("40m")
+	pathDropdownW2:Add("60m")
+	pathDropdownW2:Add("100m")
+	pathDropdownW2:Add("200m")
+
+	local speedDropdownW2 = MainTab:AddDropdown("Walk Speed", function(value)
+		walkSpeedW2 = tonumber(value)
+	end)
+	speedDropdownW2:Add("50")
+	speedDropdownW2:Add("100")
+	speedDropdownW2:Add("150")
+	speedDropdownW2:Add("200")
+	speedDropdownW2:Add("300")
+
+    -- SWITCH AUTO WIM RECUPERADO
+	MainTab:AddSwitch("Auto Wim", function(enabled)
+		autoWalkEnabledW2 = enabled
+		if enabled then
+			removeObstaclesW2()
+		else
+			if currentTweenW2 then currentTweenW2:Cancel(); currentTweenW2 = nil end
+		end
+	end)
+
+	MainTab:AddButton("REMOVE OBSTACLES", function() removeObstaclesW2() end)
+
+	task.spawn(function()
+		while task.wait() do
+			if autoWalkEnabledW2 and selectedPathW2 and #selectedPathW2 > 0 then
+				local char = player.Character
+				if not char or not char:FindFirstChild("HumanoidRootPart") then task.wait(1); continue end
+				local hrp = char.HumanoidRootPart
+				for _, p in ipairs(char:GetDescendants()) do
+					if p:IsA("BasePart") and p.CanCollide then p.CanCollide = false end
+				end
+				for i = 1, #selectedPathW2 do
+					if not autoWalkEnabledW2 then break end
+					local pos = selectedPathW2[i]
+					while autoWalkEnabledW2 and (hrp.Position - pos).Magnitude > 2 do
+						hrp.Velocity = Vector3.zero
+						hrp.RotVelocity = Vector3.zero
+						local dist = (hrp.Position - pos).Magnitude
+						local t = TweenInfo.new(dist / walkSpeedW2, Enum.EasingStyle.Linear)
+						currentTweenW2 = game:GetService("TweenService"):Create(hrp, t, {CFrame = CFrame.new(pos)})
+						currentTweenW2:Play()
+						currentTweenW2.Completed:Wait()
+						currentTweenW2 = nil
+						task.wait()
+					end
+				end
+				if autoWalkEnabledW2 and char:FindFirstChild("Humanoid") then
+					char.Humanoid.Jump = true
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.One, false, game) end)
+					task.wait(1)
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.One, false, game) end)
+				end
+			end
+		end
+	end)
+
+	local SettingsTab = mainWindow:AddTab("Settings")
+	local antiPauseEnabled = false
+	SettingsTab:AddSwitch("Anti Gameplay Paused", function(enabled)
+		antiPauseEnabled = enabled
+		if enabled then
+			task.spawn(function()
+				while antiPauseEnabled do
+					pcall(function() player.GameplayPaused = false end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+end
+
+function loadWorld3()
+	local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Nexa-Library-main-library-ui/refs/heads/main/NexaHub%20main%20.lua", true))()
+	local mainWindow = library:AddWindow("                 NEXA HUB | WORLD 3    " .. player.DisplayName, {
+		title_bar = {
+			Color3.fromRGB(0, 100, 0),
+			Color3.fromRGB(0, 160, 0),
+			Color3.fromRGB(46, 204, 113)
+		},
+		title_bar_transparency = 0.2,
+		background = {
+			Color3.fromRGB(0, 30, 0),
+			Color3.fromRGB(0, 60, 0),
+			Color3.fromRGB(0, 90, 0)
+		},
+		background_transparency = 0.1,
+		main_color = Color3.fromRGB(46, 204, 113),
+		min_size = Vector2.new(650, 650),
+		can_resize = true,
+	})
+
+	local separator = string.rep("═", 38)
+	local allLabels = {}
+
+	local function addRainbowLabel(tab, text, textSize)
+		local lbl = tab:AddLabel(text)
+		if textSize then lbl.TextSize = textSize end
+		table.insert(allLabels, lbl)
+		return lbl
+	end
+
+	local infoTab = mainWindow:AddTab("InfoTab")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "WELCOME TO NEXA HUB  FREMIUN", 28)
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "Made by: ALAN||")
+	addRainbowLabel(infoTab, "Version: v1.")
+	addRainbowLabel(infoTab, separator)
+	addRainbowLabel(infoTab, "My Friends:")
+	addRainbowLabel(infoTab, "PANA TQ")
+	addRainbowLabel(infoTab, "CRIWS")
+
+	task.spawn(function()
+		while true do
+			local hue = tick() * 0.2 % 1
+			local color = Color3.fromHSV(hue, 0.9, 1)
+			for _, lbl in ipairs(allLabels) do
+				pcall(function() lbl.TextColor3 = color end)
+			end
+			task.wait(0.02)
+		end
+	end)
+
+	local MainTab = mainWindow:AddTab("Main")
+
+	local pathsW3 = loadstring(game:HttpGet("https://raw.githubusercontent.com/progamera373-ui/Local-parths-v3/refs/heads/main/Local%20player.lua", true))()
+	local selectedPathW3 = nil
+	local autoWalkEnabledW3 = false
+	local walkSpeedW3 = 100
+	local currentTweenW3 = nil
+
+	local EXACT_NAMES_TO_DESTROY_W3 = {
+		"MovingWall1","MovingWall2","MovingWall3","MovingWall4","MovingWall5",
+		"MovingWall6","MovingWall7","MovingWall8","MovingWall9","MovingWalls",
+		"LavaPart","NPC5_AttackZone","NPC9_AttackZone","Piques","piques",
+		"Movement","Tsunami","TsunamiEnd","TsunamiSpawn","TriggerPart",
+		"Twomp","Twomps","Ventilateurs","FanEffects",
+	}
+
+	local PROTECTED_NAMES_W3 = {["Bridge1"] = true}
+
+	local function isExactNameTargetedW3(name)
+		if PROTECTED_NAMES_W3[name] then return false end
+		for _, target in ipairs(EXACT_NAMES_TO_DESTROY_W3) do
+			if name == target then return true end
+		end
+		return false
+	end
+
+	local destroyedSetW3 = setmetatable({}, {__mode = "k"})
+
+	local function safeDestroyW3(instance)
+		if destroyedSetW3[instance] then return end
+		destroyedSetW3[instance] = true
+		pcall(function() instance:Destroy() end)
+	end
+
+	local function removeObstaclesW3()
+		local removedCount = 0
+		for _, descendant in ipairs(Workspace:GetDescendants()) do
+			if descendant.Parent and isExactNameTargetedW3(descendant.Name) then
+				safeDestroyW3(descendant)
+				removedCount = removedCount + 1
+			end
+		end
+		print("[NexaHub] REMOVE OBSTACLES W3: " .. removedCount .. " removed.")
+	end
+
+	local pathDropdownW3 = MainTab:AddDropdown("Select Distance", function(value)
+		selectedPathW3 = pathsW3[value]
+	end)
+	pathDropdownW3:Add("300M")
+	pathDropdownW3:Add("500M")
+	pathDropdownW3:Add("1.25b")
+
+	local speedDropdownW3 = MainTab:AddDropdown("Walk Speed", function(value)
+		walkSpeedW3 = tonumber(value)
+	end)
+	speedDropdownW3:Add("50")
+	speedDropdownW3:Add("100")
+	speedDropdownW3:Add("150")
+	speedDropdownW3:Add("200")
+	speedDropdownW3:Add("300")
+
+    -- SWITCH AUTO WIM RECUPERADO
+	MainTab:AddSwitch("Auto Wim", function(enabled)
+		autoWalkEnabledW3 = enabled
+		if enabled then
+			removeObstaclesW3()
+		else
+			if currentTweenW3 then currentTweenW3:Cancel(); currentTweenW3 = nil end
+		end
+	end)
+
+	MainTab:AddButton("REMOVE OBSTACLES", function() removeObstaclesW3() end)
+
+	task.spawn(function()
+		while task.wait() do
+			if autoWalkEnabledW3 and selectedPathW3 and #selectedPathW3 > 0 then
+				local char = player.Character
+				if not char or not char:FindFirstChild("HumanoidRootPart") then task.wait(1); continue end
+				local hrp = char.HumanoidRootPart
+				for _, p in ipairs(char:GetDescendants()) do
+					if p:IsA("BasePart") and p.CanCollide then p.CanCollide = false end
+				end
+				for i = 1, #selectedPathW3 do
+					if not autoWalkEnabledW3 then break end
+					local pos = selectedPathW3[i]
+					while autoWalkEnabledW3 and (hrp.Position - pos).Magnitude > 2 do
+						hrp.Velocity = Vector3.zero
+						hrp.RotVelocity = Vector3.zero
+						local dist = (hrp.Position - pos).Magnitude
+						local t = TweenInfo.new(dist / walkSpeedW3, Enum.EasingStyle.Linear)
+						currentTweenW3 = game:GetService("TweenService"):Create(hrp, t, {CFrame = CFrame.new(pos)})
+						currentTweenW3:Play()
+						currentTweenW3.Completed:Wait()
+						currentTweenW3 = nil
+						task.wait()
+					end
+				end
+				if autoWalkEnabledW3 and char:FindFirstChild("Humanoid") then
+					char.Humanoid.Jump = true
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.One, false, game) end)
+					task.wait(1)
+					pcall(function() game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.One, false, game) end)
+				end
+			end
+		end
+	end)
+
+	local SettingsTab = mainWindow:AddTab("Settings")
+	local antiPauseEnabled = false
+	SettingsTab:AddSwitch("Anti Gameplay Paused", function(enabled)
+		antiPauseEnabled = enabled
+		if enabled then
+			task.spawn(function()
+				while antiPauseEnabled do
+					pcall(function() player.GameplayPaused = false end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+end
+t(false, Enum.KeyCode.One, false, game) end)
+				end
+			end
+		end
+	end)
+
+	local SettingsTab = mainWindow:AddTab("Settings")
+	local antiPauseEnabled = false
+	SettingsTab:AddSwitch("Anti Gameplay Paused", function(enabled)
+		antiPauseEnabled = enabled
+		if enabled then
+			task.spawn(function()
+				while antiPauseEnabled do
+					pcall(function() player.GameplayPaused = false end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+end
+ 
